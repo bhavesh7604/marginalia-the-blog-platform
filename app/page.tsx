@@ -15,13 +15,10 @@ export default async function HomePage() {
     .order("published_at", { ascending: false });
 
   const ids = (posts ?? []).map((p) => p.id);
-  const [{ data: likes }, { data: comments }] =
-    ids.length > 0
-      ? await Promise.all([
-          supabase.from("likes").select("post_id").in("post_id", ids),
-          supabase.from("comments").select("post_id").in("post_id", ids),
-        ])
-      : [{ data: [] }, { data: [] }];
+  const [{ data: likes }, { data: comments }] = await Promise.all([
+    supabase.from("likes").select("post_id").in("post_id", ids),
+    supabase.from("comments").select("post_id").in("post_id", ids),
+  ]);
 
   const likeCounts = countBy(likes, "post_id");
   const commentCounts = countBy(comments, "post_id");
